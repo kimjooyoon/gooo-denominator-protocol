@@ -1,0 +1,16 @@
+package denominatormeta
+namespace denominatormeta
+
+entity DenominatorCellEvidence id "gooo://denominator/cell-evidence"
+entity MigrationReceiptEvidence id "gooo://denominator/migration-receipt"
+entity DenominatorDecision id "gooo://denominator/decision"
+
+activity Observe_source_foundation_driver(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_semantic_foundation_outcome(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_artifact_coherence_guardrail(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_evaluator_coherence_driver(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_replay_regression_outcome(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_no_write_regression_guardrail(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_semantic_ir_foundation_outcome(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_semantic_generated_foundation_outcome(DenominatorCellEvidence) -> DenominatorDecision
+activity Observe_migration_regression_driver(MigrationReceiptEvidence) -> DenominatorDecision

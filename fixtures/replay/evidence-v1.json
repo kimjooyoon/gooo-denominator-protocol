@@ -1,0 +1,27 @@
+{
+  "schema": "gooo/denominator/evidence/v1",
+  "contract_id": "language-development",
+  "contract_version": 1,
+  "contract_digest": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+  "input_digest": "input:language-corpus:v1",
+  "tool_digest": "tool:denominator:v1",
+  "criteria_digest": "criteria:language-development:v1",
+  "run": {
+    "denominator_digest_at_start": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+    "denominator_digest_at_end": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+    "cell_ids_at_start": ["source-foundation-driver", "semantic-foundation-outcome", "artifact-coherence-guardrail", "evaluator-coherence-driver", "replay-regression-outcome", "no-write-regression-guardrail"],
+    "cell_ids_at_end": ["source-foundation-driver", "semantic-foundation-outcome", "artifact-coherence-guardrail", "evaluator-coherence-driver", "replay-regression-outcome", "no-write-regression-guardrail"],
+    "criteria_digest_at_start": "criteria:language-development:v1",
+    "criteria_digest_at_end": "criteria:language-development:v1",
+    "success_before_change": false,
+    "privilege_escalation_requested": false
+  },
+  "cells": [
+    {"cell_id":"source-foundation-driver","meta_activity":"Observe_source_foundation_driver","source":"examples/v1-to-v2/meta.gooo#Observe_source_foundation_driver","ir":"fixtures/ir/source-foundation-driver.json","generated_artifact":"fixtures/generated/source-foundation-driver.json","evaluator":"internal/evaluator/source-foundation-driver","decision":"CLOSED","claim":{"state":"CLOSED","stage":"","step":"","reason":"","unknown_class":"","next_operation":"","blocked_by":[]}},
+    {"cell_id":"semantic-foundation-outcome","meta_activity":"Observe_semantic_foundation_outcome","source":"examples/v1-to-v2/meta.gooo#Observe_semantic_foundation_outcome","ir":"fixtures/ir/semantic-foundation-outcome.json","generated_artifact":"fixtures/generated/semantic-foundation-outcome.json","evaluator":"internal/evaluator/semantic-foundation-outcome","decision":"CLOSED","claim":{"state":"CLOSED","stage":"","step":"","reason":"","unknown_class":"","next_operation":"","blocked_by":[]}},
+    {"cell_id":"artifact-coherence-guardrail","meta_activity":"Observe_artifact_coherence_guardrail","source":"examples/v1-to-v2/meta.gooo#Observe_artifact_coherence_guardrail","ir":"fixtures/ir/artifact-coherence-guardrail.json","generated_artifact":"fixtures/generated/artifact-coherence-guardrail.json","evaluator":"internal/evaluator/artifact-coherence-guardrail","decision":"CLOSED","claim":{"state":"CLOSED","stage":"","step":"","reason":"","unknown_class":"","next_operation":"","blocked_by":[]}},
+    {"cell_id":"evaluator-coherence-driver","meta_activity":"Observe_evaluator_coherence_driver","source":"examples/v1-to-v2/meta.gooo#Observe_evaluator_coherence_driver","ir":"fixtures/ir/evaluator-coherence-driver.json","generated_artifact":"fixtures/generated/evaluator-coherence-driver.json","evaluator":"internal/evaluator/evaluator-coherence-driver","decision":"CLOSED","claim":{"state":"CLOSED","stage":"","step":"","reason":"","unknown_class":"","next_operation":"","blocked_by":[]}},
+    {"cell_id":"replay-regression-outcome","meta_activity":"Observe_replay_regression_outcome","source":"examples/v1-to-v2/meta.gooo#Observe_replay_regression_outcome","ir":"fixtures/ir/replay-regression-outcome.json","generated_artifact":"fixtures/generated/replay-regression-outcome.json","evaluator":"internal/evaluator/replay-regression-outcome","decision":"CLOSED","claim":{"state":"CLOSED","stage":"","step":"","reason":"","unknown_class":"","next_operation":"","blocked_by":[]}},
+    {"cell_id":"no-write-regression-guardrail","meta_activity":"Observe_no_write_regression_guardrail","source":"examples/v1-to-v2/meta.gooo#Observe_no_write_regression_guardrail","ir":"fixtures/ir/no-write-regression-guardrail.json","generated_artifact":"fixtures/generated/no-write-regression-guardrail.json","evaluator":"internal/evaluator/no-write-regression-guardrail","decision":"CLOSED","claim":{"state":"CLOSED","stage":"","step":"","reason":"","unknown_class":"","next_operation":"","blocked_by":[]}}
+  ]
+}

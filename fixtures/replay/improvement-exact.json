@@ -1,0 +1,19 @@
+{
+  "schema": "gooo/denominator/improvement-pair/v1",
+  "comparison_method": "EXACT_BEFORE_AFTER",
+  "evaluator_decision": "IMPROVEMENT_CONFIRMED",
+  "before": {
+    "input_digest": "input:language-corpus:v1",
+    "tool_digest": "tool:denominator:v1",
+    "contract_digest": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+    "artifact_digest": "artifact:before",
+    "metric_values": {"closed_cells": 5, "artifact_files": 9}
+  },
+  "after": {
+    "input_digest": "input:language-corpus:v1",
+    "tool_digest": "tool:denominator:v1",
+    "contract_digest": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+    "artifact_digest": "artifact:after",
+    "metric_values": {"closed_cells": 6, "artifact_files": 9}
+  }
+}
