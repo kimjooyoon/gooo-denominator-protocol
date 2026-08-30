@@ -9,12 +9,140 @@ permissions:
   contents: read
 
 jobs:
-  scaffold:
+  conformance:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version: '1.27.x'
-      - name: Validate module
-        run: go test ./...
+
+      - name: gofmt
+        run: |
+          set -euo pipefail
+          files=$(gofmt -l .)
+          test -z "$files"
+
+      - name: Build and measure
+        id: build
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          /usr/bin/time -f '%M' -o "$RUNNER_TEMP/build-rss" go build -trimpath -o "$RUNNER_TEMP/denominator" ./cmd/denominator
+          end=$(date +%s%N)
+          echo "wall_ms=$(( (end-start)/1000000 ))" >> "$GITHUB_OUTPUT"
+          echo "peak_rss_kib=$(cat "$RUNNER_TEMP/build-rss")" >> "$GITHUB_OUTPUT"
+
+      - name: Test and measure
+        id: test
+        run: |
+          set -euo pipefail
+          start=$(date +%s%N)
+          /usr/bin/time -f '%M' -o "$RUNNER_TEMP/test-rss" go test -json ./... > "$RUNNER_TEMP/test.json"
+          end=$(date +%s%N)
+          executed=$(jq -R -s '[split("\n")[] | select(length > 0) | fromjson? | select(.Test != null and (.Action == "pass" or .Action == "fail" or .Action == "skip"))] | length' "$RUNNER_TEMP/test.json")
+          skipped=$(jq -R -s '[split("\n")[] | select(length > 0) | fromjson? | select(.Test != null and .Action == "skip")] | length' "$RUNNER_TEMP/test.json")
+          reused=$(jq -R -s '[split("\n")[] | select(contains("(cached)"))] | length' "$RUNNER_TEMP/test.json")
+          echo "wall_ms=$(( (end-start)/1000000 ))" >> "$GITHUB_OUTPUT"
+          echo "peak_rss_kib=$(cat "$RUNNER_TEMP/test-rss")" >> "$GITHUB_OUTPUT"
+          echo "executed=$executed" >> "$GITHUB_OUTPUT"
+          echo "reused=$reused" >> "$GITHUB_OUTPUT"
+          echo "skipped=$skipped" >> "$GITHUB_OUTPUT"
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: race tests
+        run: go test -race ./...
+
+      - name: Verify Gooo one-to-one contract
+        run: |
+          set -euo pipefail
+          test "$(grep -c '^activity ' examples/v1-to-v2/meta.gooo)" -eq 9
+          jq -e '(.cells|length)==6 and all(.cells[]; (.meta_activity != "" and .source != "" and .ir != "" and .generated_artifact != "" and .evaluator != "" and .metric_denominator >= 1))' contracts/denominator-v1.json >/dev/null
+          jq -e '(.cells|length)==7 and all(.cells[]; (.meta_activity != "" and .source != "" and .ir != "" and .generated_artifact != "" and .evaluator != "" and .metric_denominator >= 1))' contracts/denominator-v2.json >/dev/null
+
+      - name: Conformance and replay
+        id: conformance
+        run: |
+          set -euo pipefail
+          artifact_root="$RUNNER_TEMP/ci-artifact"
+          mkdir -p "$artifact_root/reports"
+          repo_snapshot() {
+            find "$GITHUB_WORKSPACE" -path "$GITHUB_WORKSPACE/.git" -prune -o -type f -print0 |
+              sort -z | xargs -0 sha256sum | sha256sum | awk '{print $1}'
+          }
+          repo_snapshot > "$RUNNER_TEMP/repository-before"
+          start=$(date +%s%N)
+          /usr/bin/time -f '%M' -o "$RUNNER_TEMP/conformance-rss" bash scripts/conformance.sh "$RUNNER_TEMP/denominator" "$GITHUB_WORKSPACE" "$artifact_root/reports"
+          end=$(date +%s%N)
+          repo_snapshot > "$RUNNER_TEMP/repository-after"
+          echo "wall_ms=$(( (end-start)/1000000 ))" >> "$GITHUB_OUTPUT"
+          echo "peak_rss_kib=$(cat "$RUNNER_TEMP/conformance-rss")" >> "$GITHUB_OUTPUT"
+
+      - name: Build human-readable artifact
+        id: artifact
+        run: |
+          set -euo pipefail
+          root="$GITHUB_WORKSPACE"
+          artifact_root="$RUNNER_TEMP/ci-artifact"
+          reports="$artifact_root/reports"
+          count_lines() {
+            find "$root" -path "$root/.git" -prune -o -type f ! -path "$root/README.md" -name "$1" -print0 |
+              xargs -0 awk '{n++} END {print n+0}'
+          }
+          descendant_dirs=$(find "$root" -path "$root/.git" -prune -o -mindepth 1 -type d -print | wc -l | tr -d ' ')
+          regular_files=$(find "$root" -path "$root/.git" -prune -o -type f ! -path "$root/README.md" -print | wc -l | tr -d ' ')
+          go_files=$(find "$root" -path "$root/.git" -prune -o -type f ! -path "$root/README.md" -name '*.go' -print | wc -l | tr -d ' ')
+          gooo_files=$(find "$root" -path "$root/.git" -prune -o -type f ! -path "$root/README.md" -name '*.gooo' -print | wc -l | tr -d ' ')
+          go_lines=$(count_lines '*.go')
+          gooo_lines=$(count_lines '*.gooo')
+          artifact_files=$(find "$reports" -type f -print | wc -l | tr -d ' ')
+          artifact_bytes=$(find "$reports" -type f -print0 | xargs -0 stat -c '%s' | awk '{n+=$1} END {print n+0}')
+          writes=0
+          if test "$(cat "$RUNNER_TEMP/repository-before")" != "$(cat "$RUNNER_TEMP/repository-after")"; then
+            writes=1
+          fi
+          jq -S -n \
+            --arg commit "$GITHUB_SHA" \
+            --argjson descendant_dirs "$descendant_dirs" \
+            --argjson regular_files "$regular_files" \
+            --argjson go_files "$go_files" \
+            --argjson go_lines "$go_lines" \
+            --argjson gooo_files "$gooo_files" \
+            --argjson gooo_lines "$gooo_lines" \
+            --argjson build_wall_ms "${{ steps.build.outputs.wall_ms }}" \
+            --argjson build_peak_rss_kib "${{ steps.build.outputs.peak_rss_kib }}" \
+            --argjson test_wall_ms "${{ steps.test.outputs.wall_ms }}" \
+            --argjson test_peak_rss_kib "${{ steps.test.outputs.peak_rss_kib }}" \
+            --argjson conformance_wall_ms "${{ steps.conformance.outputs.wall_ms }}" \
+            --argjson conformance_peak_rss_kib "${{ steps.conformance.outputs.peak_rss_kib }}" \
+            --argjson test_executed "${{ steps.test.outputs.executed }}" \
+            --argjson test_reused "${{ steps.test.outputs.reused }}" \
+            --argjson test_skipped "${{ steps.test.outputs.skipped }}" \
+            --argjson artifact_files "$artifact_files" \
+            --argjson artifact_bytes "$artifact_bytes" \
+            --argjson repository_writes "$writes" \
+            '{schema:"gooo/denominator/ci-artifact/v1",subject_commit:$commit,root_readme_excluded:true,repository:{descendant_dirs:$descendant_dirs,regular_files:$regular_files,go_physical_files:$go_files,go_physical_lines:$go_lines,gooo_physical_files:$gooo_files,gooo_physical_lines:$gooo_lines,repository_writes:$repository_writes},ci:{build_wall_ms:$build_wall_ms,build_peak_rss_kib:$build_peak_rss_kib,test_wall_ms:$test_wall_ms,test_peak_rss_kib:$test_peak_rss_kib,conformance_wall_ms:$conformance_wall_ms,conformance_peak_rss_kib:$conformance_peak_rss_kib,test_executed:$test_executed,test_reused:$test_reused,test_skipped:$test_skipped},artifact:{scope:"reports/",files:$artifact_files,bytes:$artifact_bytes},states:{precedence:["REFUTED","UNKNOWN","CLOSED"],percentage:false},conformance_index:"reports/conformance-index.json"}' > "$artifact_root/ci-artifact.json"
+          cat > "$artifact_root/README.txt" <<'EOF'
+          This artifact is produced by the Denominator protocol CI workflow.
+
+          reports/conformance-index.json lists the normal CLOSED replay, the
+          UNKNOWN evidence case, and fail-closed REFUTED cases. ci-artifact.json
+          contains integer-only repository, CI, artifact, and write metrics.
+          Root README.md is intentionally excluded from repository counts.
+          EOF
+          {
+            echo '## Denominator protocol conformance'
+            jq -r '"- migration v1→v2: \(.cases[0].state)","- replay v1: \(.cases[1].state) (exact counts in report)","- replay v2: \(.cases[2].state) (exact counts in report)","- UNKNOWN case: \(.cases[3].state)","- REFUTED/fail-closed cases: ([.cases[4:][]|select(.state=="REFUTED")]|length)","- no percentage aggregation: true"' "$reports/conformance-index.json"
+            jq -r '"- repository writes: \(.repository.repository_writes)","- artifact files: \(.artifact.files)","- artifact bytes: \(.artifact.bytes)","- Go files/lines: \(.repository.go_physical_files)/\(.repository.go_physical_lines)","- Gooo files/lines: \(.repository.gooo_physical_files)/\(.repository.gooo_physical_lines)","- build/test/conformance wall ms: \(.ci.build_wall_ms)/\(.ci.test_wall_ms)/\(.ci.conformance_wall_ms)","- peak RSS KiB: \(.ci.build_peak_rss_kib)/\(.ci.test_peak_rss_kib)/\(.ci.conformance_peak_rss_kib)","- tests executed/reused/skipped: \(.ci.test_executed)/\(.ci.test_reused)/\(.ci.test_skipped)"' "$artifact_root/ci-artifact.json"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "artifact_path=$artifact_root" >> "$GITHUB_OUTPUT"
+
+      - name: Upload human-readable artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: denominator-protocol-conformance
+          path: ${{ steps.artifact.outputs.artifact_path }}
+          if-no-files-found: error

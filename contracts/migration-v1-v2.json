@@ -3,10 +3,10 @@
   "migration_id": "language-development-v1-v2",
   "from_contract_id": "language-development",
   "from_version": 1,
-  "from_contract_digest": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+  "from_contract_digest": "845c3762d94059409f80ff1dd918f640f0df52c5b3ea89b85b3ee24c03014f3b",
   "to_contract_id": "language-development",
   "to_version": 2,
-  "to_contract_digest": "f7ba6674a5c00f7cdad4ce05163e744c66d89918f244f12e1942ea1e7a5821a6",
+  "to_contract_digest": "5fc46288cb49de445c070564dead92c70ecf134f9476025d6b1b7a2ed94b0250",
   "reason": "split semantic proof, add migration proof, and retire replay proof with observed evidence",
   "proof_choice": "REGRESSION",
   "affected_claims": [

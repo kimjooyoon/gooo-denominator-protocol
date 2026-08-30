@@ -5,14 +5,14 @@
   "before": {
     "input_digest": "input:language-corpus:v1",
     "tool_digest": "tool:denominator:v1",
-    "contract_digest": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+    "contract_digest": "845c3762d94059409f80ff1dd918f640f0df52c5b3ea89b85b3ee24c03014f3b",
     "artifact_digest": "artifact:before",
     "metric_values": {"closed_cells": 5, "artifact_files": 9}
   },
   "after": {
     "input_digest": "input:language-corpus:v1",
     "tool_digest": "tool:denominator:v1",
-    "contract_digest": "186bb6da115314f56d396c144c8ee1c53e978bd6e8e9b922692df44e68236ed8",
+    "contract_digest": "845c3762d94059409f80ff1dd918f640f0df52c5b3ea89b85b3ee24c03014f3b",
     "artifact_digest": "artifact:after",
     "metric_values": {"closed_cells": 6, "artifact_files": 9}
   }
