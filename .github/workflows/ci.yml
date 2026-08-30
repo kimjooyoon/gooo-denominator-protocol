@@ -22,6 +22,7 @@ jobs:
           set -euo pipefail
           files=$(gofmt -l .)
           printf '%s\n' "$files"
+          gofmt -d .
           test -z "$files"
 
       - name: Build and measure
