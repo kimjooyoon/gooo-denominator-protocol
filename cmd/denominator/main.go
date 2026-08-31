@@ -132,8 +132,8 @@ func improvementCommand(args []string) error {
 
 func emitFailure(path, reason string, err error) error {
 	failure := map[string]any{
-		"schema": denominator.ReportSchema,
-		"decision": denominator.Refuted,
+		"schema":      denominator.ReportSchema,
+		"decision":    denominator.Refuted,
 		"fail_closed": true,
 		"claim": map[string]any{
 			"state": denominator.Refuted, "stage": "VALIDATION", "step": "DECODE_JSON",

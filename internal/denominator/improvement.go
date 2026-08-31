@@ -1,7 +1,7 @@
 package denominator
 
 const (
-	ExactBeforeAfter    = "EXACT_BEFORE_AFTER"
+	ExactBeforeAfter     = "EXACT_BEFORE_AFTER"
 	ImprovementConfirmed = "IMPROVEMENT_CONFIRMED"
 	NoImprovement        = "NO_IMPROVEMENT"
 )

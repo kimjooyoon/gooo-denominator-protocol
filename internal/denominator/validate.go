@@ -89,12 +89,12 @@ func ValidateContract(contract Denominator) error {
 			return fmt.Errorf("cell %q must have a fixed positive metric denominator", cell.ID)
 		}
 		values := map[string]string{
-			"meta_activity": cell.MetaActivity,
-			"source": cell.Source,
-			"ir": cell.IR,
+			"meta_activity":      cell.MetaActivity,
+			"source":             cell.Source,
+			"ir":                 cell.IR,
 			"generated_artifact": cell.GeneratedArtifact,
-			"evaluator": cell.Evaluator,
-			"metric_id": cell.MetricID,
+			"evaluator":          cell.Evaluator,
+			"metric_id":          cell.MetricID,
 		}
 		for kind, value := range values {
 			if value == "" {

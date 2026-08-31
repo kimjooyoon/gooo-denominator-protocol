@@ -28,7 +28,7 @@ func TestMigrationV1ToV2AccountsForAddSplitAndRetire(t *testing.T) {
 		Schema: ReceiptSchema, MigrationID: "language-development-v1-v2",
 		FromContractID: from.ContractID, FromVersion: from.Version, FromContractDigest: fromDigest,
 		ToContractID: to.ContractID, ToVersion: to.Version, ToContractDigest: toDigest,
-		Reason: "split semantic proof, add migration proof, and retire replay proof with observed evidence",
+		Reason:      "split semantic proof, add migration proof, and retire replay proof with observed evidence",
 		ProofChoice: Regression, AffectedClaims: []string{"language-development/completion", "language-development/replay"},
 		Operations: []MigrationOperation{
 			{Kind: MigrationSplit, SourceCellID: "semantic-foundation-outcome", TargetCellIDs: []string{"semantic-ir-foundation-outcome", "semantic-generated-foundation-outcome"}, Reason: "separate IR and generated artifact proof", ProofChoice: Foundation, AffectedClaims: []string{"language-development/completion"}},
