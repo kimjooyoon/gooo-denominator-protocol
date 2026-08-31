@@ -13,6 +13,8 @@ evidence_v1="$root/fixtures/replay/evidence-v1.json"
 evidence_v2="$root/fixtures/replay/evidence-v2.json"
 pair="$root/fixtures/replay/improvement-exact.json"
 
+echo "v1 digest: $($bin digest --contract "$contract_v1")"
+echo "v2 digest: $($bin digest --contract "$contract_v2")"
 "$bin" migrate --from "$contract_v1" --to "$contract_v2" --receipt "$receipt" --output "$out/cases/migration-v1-v2.json"
 jq -e '.decision=="CLOSED" and .added==1 and .split==1 and .retired==1 and .fail_closed==false' "$out/cases/migration-v1-v2.json" >/dev/null
 
