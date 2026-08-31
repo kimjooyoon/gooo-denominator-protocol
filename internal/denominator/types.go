@@ -178,12 +178,12 @@ type MigrationReceipt struct {
 }
 
 type MigrationOperation struct {
-	Kind               string               `json:"kind"`
-	SourceCellID       string               `json:"source_cell_id"`
-	TargetCellIDs      []string             `json:"target_cell_ids"`
-	Reason             string               `json:"reason"`
-	ProofChoice        ProofChoice          `json:"proof_choice"`
-	AffectedClaims     []string             `json:"affected_claims"`
+	Kind               string              `json:"kind"`
+	SourceCellID       string              `json:"source_cell_id"`
+	TargetCellIDs      []string            `json:"target_cell_ids"`
+	Reason             string              `json:"reason"`
+	ProofChoice        ProofChoice         `json:"proof_choice"`
+	AffectedClaims     []string            `json:"affected_claims"`
 	RetirementEvidence *RetirementEvidence `json:"retirement_evidence"`
 }
 
