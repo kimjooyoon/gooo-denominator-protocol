@@ -136,7 +136,9 @@ jobs:
           EOF
           {
             echo '## Denominator protocol conformance'
-            jq -r '"- migration v1→v2: \(.cases[0].state)","- replay v1: \(.cases[1].state) (exact counts in report)","- replay v2: \(.cases[2].state) (exact counts in report)","- UNKNOWN case: \(.cases[3].state)","- REFUTED/fail-closed cases: ([.cases[4:][]|select(.state=="REFUTED")]|length)","- no percentage aggregation: true"' "$reports/conformance-index.json"
+            refuted=$(jq '[.cases[4:][] | select(.state=="REFUTED")] | length' "$reports/conformance-index.json")
+            jq -r '"- migration v1→v2: \(.cases[0].state)","- replay v1: \(.cases[1].state) (exact counts in report)","- replay v2: \(.cases[2].state) (exact counts in report)","- UNKNOWN case: \(.cases[3].state)","- no percentage aggregation: true"' "$reports/conformance-index.json"
+            echo "- REFUTED/fail-closed cases: $refuted"
             jq -r '"- repository writes: \(.repository.repository_writes)","- artifact files: \(.artifact.files)","- artifact bytes: \(.artifact.bytes)","- Go files/lines: \(.repository.go_physical_files)/\(.repository.go_physical_lines)","- Gooo files/lines: \(.repository.gooo_physical_files)/\(.repository.gooo_physical_lines)","- build/test/conformance wall ms: \(.ci.build_wall_ms)/\(.ci.test_wall_ms)/\(.ci.conformance_wall_ms)","- peak RSS KiB: \(.ci.build_peak_rss_kib)/\(.ci.test_peak_rss_kib)/\(.ci.conformance_peak_rss_kib)","- tests executed/reused/skipped: \(.ci.test_executed)/\(.ci.test_reused)/\(.ci.test_skipped)"' "$artifact_root/ci-artifact.json"
           } >> "$GITHUB_STEP_SUMMARY"
           echo "artifact_path=$artifact_root" >> "$GITHUB_OUTPUT"
