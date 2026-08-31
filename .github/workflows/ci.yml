@@ -106,7 +106,7 @@ jobs:
             writes=1
           fi
           jq -S -n \
-            --arg commit "$GITHUB_SHA" \
+            --arg commit "${{ github.event.pull_request.head.sha || github.sha }}" \
             --argjson descendant_dirs "$descendant_dirs" \
             --argjson regular_files "$regular_files" \
             --argjson go_files "$go_files" \
