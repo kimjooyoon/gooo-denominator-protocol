@@ -1,0 +1,58 @@
+{
+  "schema": "gooo/denominator/migration-receipt/v1",
+  "migration_id": "language-development-v1-v2",
+  "from_contract_id": "language-development",
+  "from_version": 1,
+  "from_contract_digest": "81f12f8716eff4494f124ae1e2590423c8518234725248f050e84fdb31e3a0b8",
+  "to_contract_id": "language-development",
+  "to_version": 2,
+  "to_contract_digest": "dd446bcace142b424906a780dec4096a63339174260ade9332d09d9856166566",
+  "reason": "split semantic proof, add migration proof, and retire replay proof with observed evidence",
+  "proof_choice": "REGRESSION",
+  "affected_claims": [
+    "language-development/completion",
+    "language-development/replay",
+    "language-development/migration"
+  ],
+  "operations": [
+    {
+      "kind": "SPLIT",
+      "source_cell_id": "semantic-foundation-outcome",
+      "target_cell_ids": [
+        "semantic-ir-foundation-outcome",
+        "semantic-generated-foundation-outcome"
+      ],
+      "reason": "separate IR and generated artifact proof",
+      "proof_choice": "FOUNDATION",
+      "affected_claims": ["language-development/completion"],
+      "retirement_evidence": null
+    },
+    {
+      "kind": "ADD",
+      "source_cell_id": "",
+      "target_cell_ids": ["migration-regression-driver"],
+      "reason": "make migration receipts observable",
+      "proof_choice": "REGRESSION",
+      "affected_claims": ["language-development/migration"],
+      "retirement_evidence": null
+    },
+    {
+      "kind": "RETIRE",
+      "source_cell_id": "replay-regression-outcome",
+      "target_cell_ids": [],
+      "reason": "replace the old replay cell with versioned replay evidence",
+      "proof_choice": "REGRESSION",
+      "affected_claims": ["language-development/replay"],
+      "retirement_evidence": {
+        "cell_id": "replay-regression-outcome",
+        "decision": "CLOSED",
+        "reason": "replay evidence retained in the immutable v1 report",
+        "meta_activity": "Observe_replay_regression_outcome",
+        "source": "examples/v1-to-v2/meta.gooo#Observe_replay_regression_outcome",
+        "ir": "fixtures/ir/replay-regression-outcome.json",
+        "generated_artifact": "fixtures/generated/replay-regression-outcome.json",
+        "evaluator": "internal/evaluator/replay-regression-outcome"
+      }
+    }
+  ]
+}
